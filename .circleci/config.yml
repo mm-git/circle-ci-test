@@ -40,4 +40,4 @@ jobs:
       - run:
           name: Wait for db
           command: |
-            dockerize -wait tcp://localhost:5432 -timeout 2m
+            dockerize -wait tcp://172.18.0.2:5432 -timeout 2m
