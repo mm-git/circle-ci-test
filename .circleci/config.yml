@@ -30,6 +30,7 @@ jobs:
             docker-compose up -d
             docker inspect database
             docker ps -a
+            sleep 10s
             docker logs database
       - run:
           name: install dockerize
