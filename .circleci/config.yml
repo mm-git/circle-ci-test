@@ -29,6 +29,7 @@ jobs:
             cd docker
             docker-compose up -d
             docker inspect database
+            docker ps -a
       - run:
           name: install dockerize
           command: |
