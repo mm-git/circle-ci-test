@@ -4,6 +4,8 @@ services:
   database:
     image: postgres:9.2
     container_name: database
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     environment:
