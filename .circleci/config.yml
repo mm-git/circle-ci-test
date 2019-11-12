@@ -1,0 +1,43 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.8
+    working_directory: /go/src/circle-ci-test
+    steps:
+      # ファイル名が日本語でもcheckoutできるようにする
+      - run:
+          command: 'git config --global core.quotepath false'
+      - checkout
+
+      - setup_remote_docker:
+          version: 18.06.0-ce
+      # ローカルCLI実行でdockerを使えるようにする
+      - run:
+          name: docker for local CLI
+          command: |
+            if [[ $CIRCLE_SHELL_ENV =~ "localbuild" ]]; then
+              sudo chown root /usr/bin/docker
+              sudo chown root /usr/bin/docker-compose
+              sudo chmod u+s /usr/bin/docker
+              sudo chmod u+s /usr/bin/docker-compose
+            fi
+
+      - run:
+          name: start docker
+          command: |
+            cd docker
+            docker-compose up -d
+            docker inspect database
+      - run:
+          name: install dockerize
+          command: |
+            wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.6.1
+      - run:
+          name: Wait for db
+          command: |
+            dockerize -wait tcp://localhost:5432 -timeout 2m
